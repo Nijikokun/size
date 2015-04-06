@@ -11,7 +11,7 @@ let human ?(a = 1024.) b =
   in
 
   let rec loop l o = match l, o with
-    | (l, o) when l >= a && (o + 1) < (Array.length u) -> loop (l /. a) (o+1)
+    | (l, o) when l >= a && (o + 1) < (Array.length u) -> loop (l /. a) (o + 1)
     | x -> x
   in
 
