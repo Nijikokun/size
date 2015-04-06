@@ -1,11 +1,25 @@
-let human (b:int) =
-  let u = [|"K";"M";"G";"T";"P";"E";"Z";"Y"|] in
-  let m = b |> float_of_int |> log |> fun x -> x /. log 1000. in
-  let r = b |> float_of_int |> fun x -> x /. 1000. ** m in
-  let s = match (int_of_float m), (int_of_float r) with
-    | (x,_) when x  <> 0     -> u.(x - 1) ^ "B"
-    | (_,x) when x lor 0 = 1 -> "Byte"
-    | _ -> "Bytes"
+type t =
+  | Bits_t of int
+  | Bytes_t of int
+
+let human ?(a = 1024.) b =
+  let u = [|""; "K";"M";"G";"T";"P";"E";"Z";"Y"|] in
+
+  let (v, ss, n) = match b with
+    | Bits_t x -> (x, "b", "Bit")
+    | Bytes_t x -> (x, "B", "Byte")
   in
 
-  Printf.sprintf "%.2f %s" r s
+  let rec loop l o = match l, o with
+    | (l, o) when l >= a && (o + 1) < (Array.length u) -> loop (l /. a) (o+1)
+    | x -> x
+  in
+
+  let (l, o) = loop (float_of_int v) 0 in
+
+  let s = match u.(o) with
+    | t when t = "" -> n ^ (if ((int_of_float l) lxor 0) = 1 then "s" else "")
+    | x -> x ^ ss
+  in
+
+  Printf.sprintf "%.2f %s" l s
